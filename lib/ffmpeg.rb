@@ -70,7 +70,7 @@ class FFmpeg
 
     scale = @params[:small] ? 'scale=320:180,' : ''
 
-    "trim=duration=#{len},#{scale}format=rgba,#{fadein}#{fadeout}setpts=PTS+#{from}/TB"
+    "trim=duration=#{len},#{scale}format=rgba,#{fadein}#{fadeout}setpts=PTS+#{from}/TB,fifo"
   end
 
   def time_to_secons(time)
