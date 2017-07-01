@@ -29,13 +29,13 @@ class FFmpeg
     filters = ''
 
     if @params[:small]
-      filters += '[0:v] scale=320:180,fifo [main];'
-      filters += '[1:v] scale=320:180 [intro];'
-      filters += '[2:v] scale=320:180 [outro];'
+      filters += '[0:v] fps=30,scale=320:180,fifo [main];'
+      filters += '[1:v] fps=30,scale=320:180 [intro];'
+      filters += '[2:v] fps=30,scale=320:180 [outro];'
     else
-      filters += '[0:v] copy,fifo [main];'
-      filters += '[1:v] copy [intro];'
-      filters += '[2:v] copy [outro];'
+      filters += '[0:v] fps=30,fifo [main];'
+      filters += '[1:v] fps=30 [intro];'
+      filters += '[2:v] fps=30 [outro];'
     end
 
     filters += '[0:a] loudnorm [amain];'
@@ -70,7 +70,7 @@ class FFmpeg
 
     scale = @params[:small] ? 'scale=320:180,' : ''
 
-    "trim=duration=#{len},#{scale}format=rgba,#{fadein}#{fadeout}setpts=PTS+#{from}/TB,fifo"
+    "fps=30,trim=duration=#{len},#{scale}format=rgba,#{fadein}#{fadeout}setpts=PTS+#{from}/TB,fifo"
   end
 
   def time_to_secons(time)
