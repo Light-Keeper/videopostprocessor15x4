@@ -1,0 +1,54 @@
+<html>
+<head>
+    <meta charset="UTF-8"/>
+</head>
+<style>
+    @font-face {
+        font-family: "DINNextBold";
+        src: url(medium.ttf);
+    }
+
+    @font-face {
+        font-family: "DINNextLight";
+        src: url("light.ttf");
+    }
+
+    body {
+        margin: 0;
+        color: white;
+        width: 1920px;
+        heigt: 1080px;
+    }
+
+    .lection {
+        display: block;
+        word-wrap:break-word;
+        position: absolute;
+        top: 875px;
+        left: 240px;
+        width: 1680px;
+        font-family: "DINNextLight";
+        font-weight: 100;
+        font-size: 3.5rem;
+    }
+
+    .name {
+        display: block;
+        word-wrap:break-word;
+        position: absolute;
+        top: 955px;
+        left: 240px;
+        width: 1680px;
+        font-family: "DINNextBold";
+        font-weight: 200;
+        font-size: 3.5rem;
+
+
+    }
+</style>
+<body>
+<img src="background.png"/>
+<span class="lection">{{title}}</span>
+<span class="name">{{name}}</span>
+</body>
+</html>
