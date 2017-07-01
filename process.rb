@@ -8,22 +8,25 @@ require_relative 'lib/ffmpeg'
 options = CmdArgumens.new.options
 out_dir = './out'
 pic_out_dit = "#{out_dir}/pic"
+cache_dir = "#{out_dir}/cache"
+dst = "#{out_dir}/res.mp4"
 view_dir = './view'
+
 
 if options[:pic]
   raise "working directory URL must be specified" unless options[:id]
-  google = GoogleAccessor.new(options[:id])
+  google = GoogleAccessor.new
   generator = PictureGenerator.new(pic_out_dit,view_dir)
-  generator.render_pictures google.extract_lection_data
+  generator.render_pictures google.extract_lection_data(options[:id])
 end
 
 raise "video URI must be present!" unless options[:video]
-video_provider = VideoProvider.new
+video_provider = VideoProvider.new(cache_dir)
 video = video_provider.getFile options[:video]
 
 lection_data = JSON.parse File.read("#{pic_out_dit}/data.json")
 
-ffmpeg = FFmpeg.new video,
+ffmpeg = FFmpeg.new video, dst,
                     "#{pic_out_dit}/title.png", lection_data['subs'],
                     small:options[:small], dry:options[:dry]
 

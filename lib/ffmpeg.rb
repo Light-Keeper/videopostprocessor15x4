@@ -1,15 +1,17 @@
 class FFmpeg
-  def initialize(video, title, subs, params = {})
+  def initialize(video, dst, title, subs, params = {})
     @video = video
     @title = title
     @subs = subs
     @params = params
+    @dst = dst
   end
 
   def render
     cmd = construct_cmd
-    p ""
+    p "-------------------------------------------------------------------------"
     p cmd
+    p "-------------------------------------------------------------------------"
     system cmd unless @params[:dry]
   end
 
@@ -52,7 +54,7 @@ class FFmpeg
     filters += "[tmp#{@subs.size}] copy [lection];"
     filters += "[intro] [aintro] [lection] [amain] [outro] [aoutro] concat=n=3:v=1:a=1"
 
-    %{ffmpeg #{inputs}  -filter_complex "#{filters}" -y ./out/res.mp4 }.gsub(/\s+/, ' ').strip
+    %{ffmpeg #{inputs}  -filter_complex "#{filters}" -y '#{@dst}' }.gsub(/\s+/, ' ').strip
   end
 
   def filtered_subs (&block)
