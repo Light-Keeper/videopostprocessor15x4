@@ -4,8 +4,23 @@ require_relative 'lib/picture_generator'
 require_relative 'lib/video_provider'
 require_relative 'lib/cmd_arguments'
 require_relative 'lib/ffmpeg'
+require_relative 'lib/trello_accessor'
 
 options = CmdArgumens.new.options
+options[:pic] = true; #force it
+
+if options[:trello]
+  trello = TrelloAccessor.new
+  info = trello.card_info options[:trello]
+
+  p "trello info:"
+  p info
+
+  options[:video] ||= info[:video]
+  options[:workdir] ||= info[:workdir]
+end
+
+
 out_dir = './out'
 pic_out_dit = "#{out_dir}/pic"
 cache_dir = "#{out_dir}/cache"
@@ -14,10 +29,10 @@ view_dir = './view'
 
 
 if options[:pic]
-  raise "working directory URL must be specified" unless options[:id]
+  raise "working directory URL must be specified" unless options[:workdir]
   google = GoogleAccessor.new
   generator = PictureGenerator.new(pic_out_dit,view_dir)
-  generator.render_pictures google.extract_lection_data(options[:id])
+  generator.render_pictures google.extract_lection_data(options[:workdir])
 end
 
 raise "video URI must be present!" unless options[:video]
