@@ -7,16 +7,15 @@ require_relative 'lib/ffmpeg'
 require_relative 'lib/trello_accessor'
 
 options = CmdArgumens.new.options
-options[:pic] = true; #force it
 
 if options[:trello]
   trello = TrelloAccessor.new
   info = trello.card_info options[:trello]
 
-  p "trello info:"
-  p info
+  puts "trello info:"
+  puts info
 
-  options[:video] ||= info[:video]
+  options[:input] ||= info[:video]
   options[:workdir] ||= info[:workdir]
 end
 
@@ -35,16 +34,20 @@ if options[:pic]
   generator.render_pictures google.extract_lection_data(options[:workdir])
 end
 
-raise "video URI must be present!" unless options[:video]
-video_provider = VideoProvider.new(cache_dir)
-video = video_provider.getFile options[:video]
+if options[:video]
+  raise "video URI must be present!" unless options[:video]
 
-lection_data = JSON.parse File.read("#{pic_out_dit}/data.json")
+  video_provider = VideoProvider.new(cache_dir)
+  video = video_provider.getFile options[:input]
 
-ffmpeg = FFmpeg.new video, dst,
-                    "#{pic_out_dit}/title.png", lection_data['subs'],
-                    small:options[:small], dry:options[:dry]
+  lection_data = JSON.parse File.read("#{pic_out_dit}/data.json")
+  ffmpeg = FFmpeg.new(video,
+                      dst,
+                      "#{pic_out_dit}/title.png",
+                      lection_data['subs'],
+                      small:options[:small], dry:options[:dry])
+  ffmpeg.render
+end
 
-ffmpeg.render
 
 

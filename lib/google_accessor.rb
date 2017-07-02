@@ -15,9 +15,9 @@ class GoogleAccessor
     `rm '#{tmp}'` if File.file? tmp
 
     if File.file?(res)
-      p "reusing cached file #{res}"
+      puts "reusing cached file #{res}"
     else
-      p "donwloading file to #{res}"
+      puts "donwloading file to #{res}"
       file.download_to_file(tmp)
       `mv '#{tmp}' '#{res}'`
     end

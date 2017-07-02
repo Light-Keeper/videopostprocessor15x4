@@ -9,9 +9,9 @@ class FFmpeg
 
   def render
     cmd = construct_cmd
-    p "-------------------------------------------------------------------------"
-    p cmd
-    p "-------------------------------------------------------------------------"
+    puts "-------------------------------------------------------------------------"
+    puts cmd
+    puts "-------------------------------------------------------------------------"
     system cmd unless @params[:dry]
   end
 
@@ -19,8 +19,8 @@ class FFmpeg
     fill_fade_options @subs
 
     inputs = " -i '#{@video}'"
-    inputs += ' -i ./view/intro.mp4'
-    inputs += ' -i ./view/outro.mp4'
+    inputs += " -i './view/intro.mp4'"
+    inputs += " -i './view/outro.mp4'"
 
     inputs += " -loop 1 -i '#{@title}'"
     inputs += @subs.map {|s| " -loop 1 -i '#{s['path']}'"} .join(' ')
