@@ -17,33 +17,42 @@ class FFmpeg
   end
 
   def construct_cmd
+    %{ffmpeg #{all_inputs}  -filter_complex "#{all_filters}" -y '#{@dst}' }.gsub(/\s+/, ' ').strip
+  end
 
-    inputs = " -i '#{@video}'"
-    inputs += " -i './view/intro.mp4'"
-    inputs += " -i './view/outro.mp4'"
+  def all_inputs
+    " -i '#{@video}'" +
+    " -i './view/intro.mp4'" +
+    " -i './view/outro.mp4'" +
+    " -loop 1 -i '#{@title}'" +
+    @subs.map {|s| " -loop 1 -i '#{s['path']}'"} .join(' ')
+  end
 
-    inputs += " -loop 1 -i '#{@title}'"
-    inputs += @subs.map {|s| " -loop 1 -i '#{s['path']}'"} .join(' ')
+  def all_filters
+    "#{basic_input_filteting}#{picture_input_filters}#{overlay}#{concat}"
+  end
 
-    filters = ''
-    filters += "[0:v] #{main_video_crop},#{input_video_filter} [main];"
-    filters += "[1:v] #{input_video_filter} [intro];"
-    filters += "[2:v] #{input_video_filter} [outro];"
+  def basic_input_filteting
+    "[0:v] #{main_video_crop},#{input_video_filter} [main];" +
+    "[1:v] #{input_video_filter} [intro];" +
+    "[2:v] #{input_video_filter} [outro];" +
+    '[0:a] loudnorm [amain];' +
+    '[1:a] loudnorm [aintro];' +
+    '[2:a] loudnorm [aoutro];'
+  end
 
-    filters += '[0:a] loudnorm [amain];'
-    filters += '[1:a] loudnorm [aintro];'
-    filters += '[2:a] loudnorm [aoutro];'
+  def picture_input_filters
+    "[3:0] #{picture_filter 0, 6} [title];" +
+    @subs.each_with_index.map {|s, i| "[#{i + 4}:0] #{picture_filter s['start'], s['end']} [sub#{i}];" }.join(' ')
+  end
 
-    filters += "[3:0] #{picture_filter 0, 6} [title];"
-    filters += @subs.each_with_index.map {|s, i| "[#{i + 4}:0] #{picture_filter s['start'], s['end']} [sub#{i}];" }.join(' ')
+  def overlay
+    '[main][title] overlay=eof_action=pass:repeatlast=0 [tmp0];' +
+    @subs.each_with_index.map { |s, i| "[tmp#{i}][sub#{i}] overlay=eof_action=pass:repeatlast=0 [tmp#{i + 1}];" }.join(' ')
+  end
 
-    filters += "[main][title] overlay=eof_action=pass:repeatlast=0 [tmp0];"
-    filters += @subs.each_with_index.map { |s, i| "[tmp#{i}][sub#{i}] overlay=eof_action=pass:repeatlast=0 [tmp#{i + 1}];" }.join(' ')
-
-    filters += "[tmp#{@subs.size}] copy [lection];"
-    filters += "[intro] [aintro] [lection] [amain] [outro] [aoutro] concat=n=3:v=1:a=1"
-
-    %{ffmpeg #{inputs}  -filter_complex "#{filters}" -y '#{@dst}' }.gsub(/\s+/, ' ').strip
+  def concat
+    "[intro] [aintro] [tmp#{@subs.size}] [amain] [outro] [aoutro] concat=n=3:v=1:a=1"
   end
 
   def picture_filter(from, to)
