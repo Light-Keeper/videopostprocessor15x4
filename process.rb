@@ -2,22 +2,10 @@ require 'json'
 require_relative 'lib/lection_info_accessor'
 require_relative 'lib/picture_generator'
 require_relative 'lib/video_provider'
-require_relative 'lib/cmd_arguments'
+require_relative 'lib/parameters'
 require_relative 'lib/ffmpeg'
-require_relative 'lib/trello_accessor'
 
-options = CmdArgumens.new.options
-
-if options[:trello]
-  trello = TrelloAccessor.new
-  info = trello.card_info options[:trello]
-
-  puts "trello info:"
-  puts info
-
-  options[:video] ||= info[:video]
-  options[:workdir] ||= info[:workdir]
-end
+options = Parameters.new.options
 
 out_dir = './out'
 dst = options[:output] || out_dir + '/res.mp4'

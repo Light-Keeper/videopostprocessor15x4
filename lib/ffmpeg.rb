@@ -59,6 +59,8 @@ class FFmpeg
   def time_to_secons(time)
     return time if time.is_a? Integer
     return time if time.is_a? Float
+    return 100000000 if time == "" # time has not been set
+
     s = time.split(':').map {|v| v.to_f}
 
     return s[0] if s.size == 1
@@ -95,7 +97,7 @@ class FFmpeg
   def get_video_resolution
     @video_resolution_cache if @video_resolution_cache
 
-    res = `ffprobe -v error -of flat=s=_ -select_streams v:0 -show_entries stream=height,width #{@video}`
+    res = `ffprobe -v error -of flat=s=_ -select_streams v:0 -show_entries stream=height,width '#{@video}'`
     match = /streams_stream_0_width=(\d+)\nstreams_stream_0_height=(\d+)\n/.match(res)
     raise "ffprobe has unexpected output: '#{res}'" unless match
     width, height = match.captures
