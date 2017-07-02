@@ -23,7 +23,7 @@ end
 out_dir = './out'
 pic_out_dit = "#{out_dir}/pic"
 cache_dir = "#{out_dir}/cache"
-dst = "#{out_dir}/res.mp4"
+dst = options[:output] || out_dir + '/res.mp4'
 view_dir = './view'
 
 

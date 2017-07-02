@@ -14,6 +14,7 @@ class CmdArgumens
       opts.on('-v', '--video', 'rebuild video') { |p| @options[:video] = true }
       opts.on('-d', '--dry', 'dont actually run conversion') { |p| @options[:dry] = true }
       opts.on('-s', '--small', 'generate small video') { |p| @options[:small] = true }
+      opts.on('-o', '--output=PATH', 'output video') { |p| @options[:output] = p }
     end.parse!
   end
 
