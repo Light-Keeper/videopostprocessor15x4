@@ -24,7 +24,7 @@ class PictureGenerator
       generic_generate('subtitles', sub[:path], text:sub[:text])
     end
 
-    File.open("#{@destination}/subs.json", 'w') { |file| file.write(subs.to_json) }
+    File.open("#{@destination}/subs.json", 'w') { |file| file.write( JSON.pretty_generate subs) }
   end
 
   def rendered_title_path

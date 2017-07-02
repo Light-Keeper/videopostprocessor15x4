@@ -16,7 +16,7 @@ class Parameters
       opts.on('-d', '--dry', 'dont actually run conversion') { |p| options[:dry] = true }
       opts.on('-s', '--small', 'generate small video') { |p| options[:small] = true }
       opts.on('-o', '--output=PATH', 'output video') { |p| options[:output] = p }
-      opts.on('-p', '--publish', 'prepare to publication') { |p| options[:publish] = p }
+      opts.on('', '--publish', 'prepare to publication') { |p| options[:publish] = p }
     end.parse!
 
     if options[:trello]
