@@ -1,3 +1,4 @@
+require 'fileutils'
 require_relative './google_accessor'
 
 class VideoProvider
@@ -5,7 +6,7 @@ class VideoProvider
 
   def initialize(cache)
     @cache = cache
-    `mkdir -p #{cache}`
+    FileUtils.mkpath cache
   end
 
   def getFile( url )

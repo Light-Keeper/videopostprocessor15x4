@@ -1,5 +1,5 @@
 require 'json'
-require_relative 'lib/google_accessor'
+require_relative 'lib/lection_info_accessor'
 require_relative 'lib/picture_generator'
 require_relative 'lib/video_provider'
 require_relative 'lib/cmd_arguments'
@@ -15,37 +15,33 @@ if options[:trello]
   puts "trello info:"
   puts info
 
-  options[:input] ||= info[:video]
+  options[:video] ||= info[:video]
   options[:workdir] ||= info[:workdir]
 end
 
-
 out_dir = './out'
-pic_out_dit = "#{out_dir}/pic"
-cache_dir = "#{out_dir}/cache"
 dst = options[:output] || out_dir + '/res.mp4'
-view_dir = './view'
 
+pictures = PictureGenerator.new("#{out_dir}/pic",'./view')
 
 if options[:pic]
   raise "working directory URL must be specified" unless options[:workdir]
-  google = GoogleAccessor.new
-  generator = PictureGenerator.new(pic_out_dit,view_dir)
-  generator.render_pictures google.extract_lection_data(options[:workdir])
+  lection = LectionInfoAccessor.new(options[:workdir])
+
+  pictures.clear
+  pictures.render_title lection.lector_name, lection.title
+  pictures.render_subs lection.subs
 end
 
-if options[:video]
+if options[:convert]
   raise "video URI must be present!" unless options[:video]
+  video = VideoProvider.new("#{out_dir}/cache").getFile options[:video]
 
-  video_provider = VideoProvider.new(cache_dir)
-  video = video_provider.getFile options[:input]
-
-  lection_data = JSON.parse File.read("#{pic_out_dit}/data.json")
   ffmpeg = FFmpeg.new(video,
                       dst,
-                      "#{pic_out_dit}/title.png",
-                      lection_data['subs'],
-                      small:options[:small], dry:options[:dry])
+                      pictures.rendered_title_path,
+                      pictures.rendered_subs,
+                      options)
   ffmpeg.render
 end
 
