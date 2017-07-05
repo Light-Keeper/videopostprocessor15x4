@@ -37,5 +37,6 @@ if options[:publish]
   raise "working directory URL must be specified" unless options[:workdir]
   lection = LectionInfoAccessor.new(options[:workdir])
   lection.share_slides
+  lection.put_youtube_text
 end
 

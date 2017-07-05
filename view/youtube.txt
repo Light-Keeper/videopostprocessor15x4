@@ -1,0 +1,12 @@
+«{{description}}» – {{lector_name}} ({{lector_link}})
+
+Слайды – {{slides}}
+
+15х4 - это сообщество молодых ученых и фанатов науки.
+Мы хотим, чтобы люди выступали и делились знаниями.
+
+http://15x4.org
+http://vk.com/15x4talks
+http://twitter.com/15x4talks
+http://facebook.com/15x4talks
+http://instagram.com/15x4talks

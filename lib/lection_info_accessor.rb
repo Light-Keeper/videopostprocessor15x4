@@ -1,5 +1,5 @@
-require_relative './google_accessor'
 require 'googl'
+require_relative './google_accessor'
 
 class LectionInfoAccessor
 
@@ -11,24 +11,14 @@ class LectionInfoAccessor
     raise "can not find general workshet in the info.gsheet" unless @general
   end
 
-  def lector_name
-    find 'Имя лектора'
-  end
-
-  def title
-    find 'Название'
-  end
-
   def subs
     subtitles = @info.worksheet_by_title 'subtitles'
-
     (3..subtitles.num_rows).map {|i| {
         start:  subtitles[i, 1],
         end:    subtitles[i, 2],
         text:   subtitles[i, 3],
         id:     i
     }}
-
   end
 
   def share_slides
@@ -47,6 +37,40 @@ class LectionInfoAccessor
     url = @google.shorten_url  to_share.human_url
     set('Ссылка на слайды', url)
   end
+
+  def put_youtube_text
+    data = {
+        lector_name: self.lector_name,
+        lector_link: self.lector_link,
+        description: self.description,
+        slides: self.slides,
+    }
+
+    text = File.read('./view/youtube.txt')
+    data.each do |key, value|
+      text = text.gsub("{{#{key}}}", value)
+    end
+
+    self.youtube_text = text
+  end
+
+  def lector_name()   find('Имя лектора')  end
+  def lector_link()   find('ссылка на соцсеть лектора')  end
+  def title()         find('Название')  end
+  def description()   find('Описание')  end
+  def slides()        find('Ссылка на слайды')  end
+  def vk_event()      find('ссылки на ивент в вк')  end
+  def ready_video()   find('готовое к публикации видео')  end
+  def youtube_text()  find('текст для ютуба') end
+
+  def name=(val)          set('Имя лектора', val)  end
+  def lector_link=(val)   set('ссылка на соцсеть лектора', val)  end
+  def title=(val)         set('Название', val)  end
+  def description=(val)   set('Описание', val)  end
+  def slides=(val)        set('Ссылка на слайды', val)  end
+  def vk_event=(val)      set('ссылки на ивент в вк', val)  end
+  def ready_video=(val)   set('готовое к публикации видео', val)  end
+  def youtube_text=(val)  set('текст для ютуба', val) end
 
   private
 
