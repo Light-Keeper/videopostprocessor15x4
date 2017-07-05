@@ -9,7 +9,7 @@ class VideoProvider
     FileUtils.mkpath cache
   end
 
-  def getFile( url )
+  def get_file( url )
     plain_file(url) || google_drive_video(url) || unsupported(url)
   end
 

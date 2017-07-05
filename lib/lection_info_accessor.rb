@@ -22,8 +22,8 @@ class LectionInfoAccessor
   end
 
   def share_slides
-    if  find('Ссылка на слайды') != ''
-      puts "slides url has already been set. skipping!"
+    if  self.slides != ''
+      puts 'slides url has already been set. skipping!'
       return
     end
 
@@ -32,10 +32,9 @@ class LectionInfoAccessor
     files = presentation_dir.files
     raise 'presentation directory must have exactly 1 file or directory to share' unless files.size == 2
     to_share = files.find {|x| x.title != 'pages'}
-    to_share.acl.push({type: "anyone", role: "reader"})
+    to_share.acl.push({type: 'anyone', role: 'reader'})
 
-    url = @google.shorten_url  to_share.human_url
-    set('Ссылка на слайды', url)
+    self.slides = @google.shorten_url  to_share.human_url
   end
 
   def put_youtube_text
@@ -86,14 +85,12 @@ class LectionInfoAccessor
 
   def find_row(title)
     row = (2..100).find {|i| @general[i, 1].downcase.include? title.downcase}
-    raise "can not find row with title #{title} in the general workshet" unless row
-    row
+    row || raise("can not find row with title #{title} in the general workshet")
   end
 
   def info_file
     workdir =  @google.file_by_url @url
     res = workdir.spreadsheets.find {|s| s.title == "info"}
-    raise 'can not find info.gsheet!' unless res
-    res
+    res || raise('can not find info.gsheet!')
   end
 end

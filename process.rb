@@ -23,7 +23,7 @@ end
 
 if options[:convert]
   raise "video URI must be present!" unless options[:video]
-  video = VideoProvider.new("#{out_dir}/cache").getFile options[:video]
+  video = VideoProvider.new("#{out_dir}/cache").get_file options[:video]
 
   ffmpeg = FFmpeg.new(video,
                       dst,

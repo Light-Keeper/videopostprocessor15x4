@@ -57,7 +57,6 @@ class PictureGenerator
     kit = IMGKit.new(File.new("#{tmp}/index.html"), transparent:true, quality:20)
     kit.to_file resultname
     FileUtils.rm_rf tmp
-
   end
 
 end

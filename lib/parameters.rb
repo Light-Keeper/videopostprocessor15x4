@@ -23,7 +23,7 @@ class Parameters
       trello = TrelloAccessor.new
       info = trello.card_info options[:trello]
 
-      puts "trello info:"
+      puts 'trello info:'
       puts info
 
       options[:video] ||= info[:video]

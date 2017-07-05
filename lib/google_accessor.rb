@@ -28,7 +28,6 @@ class GoogleAccessor
     res
   end
 
-
   def file_by_url(url)
     uri = URI.parse(url)
 
@@ -41,14 +40,9 @@ class GoogleAccessor
   end
 
   def shorten_url(long_url)
-    query = {'longUrl' => long_url}
-
-    headers = {'Content-Type' => 'application/json',
-        'Authorization' => 'Bearer ' + @credentials.access_token}
-
-    res = HTTParty.post("https://www.googleapis.com//urlshortener/v1/url",
-                        :body => query.to_json, :headers => headers)
-
+    res = HTTParty.post('https://www.googleapis.com//urlshortener/v1/url',
+                        body: {longUrl:long_url}.to_json,
+                        headers: {'Content-Type'.to_sym => 'application/json', :Authorization => 'Bearer ' + @credentials.access_token})
     raise "invalid shortner response: #{res}" unless res['id']
     res['id']
   end
