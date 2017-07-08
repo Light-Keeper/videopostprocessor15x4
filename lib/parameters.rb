@@ -32,7 +32,4 @@ class Parameters
 
     @options = options
   end
-
 end
-
-

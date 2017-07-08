@@ -7,3 +7,5 @@ gem 'OptionParser', '0.5.1'
 gem 'google_drive'
 gem 'ruby-trello', '2.0.0'
 gem 'httparty', '0.15.5'
+
+gem 'nokogiri', '1.8.0 ruby java x64-mingw32 x86-mingw32'
