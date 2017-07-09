@@ -1,4 +1,7 @@
+require_relative './file_format_utils'
+
 class FFmpeg
+  include FileFormatUtils
 
   def initialize(video, dst, title, subs, params = {})
     @video = video
@@ -33,7 +36,7 @@ class FFmpeg
   end
 
   def basic_input_filteting
-    "[0:v] #{main_video_crop},#{input_video_filter} [main];" +
+    "[0:v] #{get_crop_to_16x9_filter @video},#{input_video_filter} [main];" +
     "[1:v] #{input_video_filter} [intro];" +
     "[2:v] #{input_video_filter} [outro];" +
     '[0:a] loudnorm [amain];' +
@@ -79,39 +82,11 @@ class FFmpeg
   end
 
   def input_video_filter
-    return @input_vide_filter if @input_vide_filter
-
-
-    if @params[:small]
-      @input_vide_filter = 'fps=30,scale=320:180,fifo'
-    else
-      video_resolution = get_video_resolution_16x9
-      @input_vide_filter = "fps=30,scale=#{video_resolution[:width]}:#{video_resolution[:height]},fifo"
-    end
-
-    @input_vide_filter
+    @input_vide_filter ||= @params[:small] ? 'fps=30,scale=320:180,fifo'
+                               : "fps=30,scale=#{main_video_resolution[:width]}:#{main_video_resolution[:height]},fifo"
   end
 
-  def get_video_resolution_16x9
-    r = get_video_resolution
-    i = (480.downto 1).find { |i| i*16 <= r[:width] && i*9 <= r[:height] }
-    {width:i*16,height:i*9}
+  def main_video_resolution
+    @main_video_resolution ||= get_video_resolution_16x9 @video
   end
-
-  def main_video_crop
-    r = get_video_resolution_16x9
-    "crop=#{r[:width]}:#{r[:height]}"
-  end
-
-  def get_video_resolution
-    @video_resolution_cache if @video_resolution_cache
-
-    res = `ffprobe -v error -of flat=s=_ -select_streams v:0 -show_entries stream=height,width '#{@video}'`
-    match = /streams_stream_0_width=(\d+)\nstreams_stream_0_height=(\d+)\n/.match(res)
-    raise "ffprobe has unexpected output: '#{res}'" unless match
-    width, height = match.captures
-
-    @video_resolution_cache = {width:width.to_i,height:height.to_i}
-  end
-
 end

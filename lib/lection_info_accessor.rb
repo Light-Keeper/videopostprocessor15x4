@@ -1,7 +1,9 @@
 require 'googl'
 require_relative './google_accessor'
+require_relative './file_format_utils'
 
 class LectionInfoAccessor
+  include FileFormatUtils
 
   def initialize(url)
     @url = url
@@ -35,6 +37,30 @@ class LectionInfoAccessor
     to_share.acl.push({type: 'anyone', role: 'reader'})
 
     self.slides = @google.shorten_url  to_share.human_url
+  end
+
+  def patch_background
+    icon = workdir.file_by_title 'icon.png'
+    background = workdir.file_by_title 'background.png'
+
+    unless icon && background
+      puts 'can not find icon.png or background.png. skipping...'
+      return
+    end
+
+    icon_path = './out/icon.png'
+    bg_path = './out/background.png'
+    thumb_path = './out/thumbnail.png'
+
+    File.delete(thumb_path) if File.exist?(thumb_path)
+    icon.download_to_file(icon_path)
+    background.download_to_file(bg_path)
+
+    crop = get_crop_to_16x9_filter bg_path
+    `ffmpeg -i #{bg_path} -i #{icon_path} -filter_complex '[0:0] #{crop},scale=1280:720 [b];[b][1:0]overlay=x=30:y=30' -y ./out/thumbnail.png`
+
+    workdir.upload_from_file(thumb_path, 'thumbnail.png', :convert => false)
+    puts 'thumbnail.png generated!'
   end
 
   def put_youtube_text
@@ -89,8 +115,11 @@ class LectionInfoAccessor
   end
 
   def info_file
-    workdir =  @google.file_by_url @url
     res = workdir.spreadsheets.find {|s| s.title == "info"}
     res || raise('can not find info.gsheet!')
+  end
+
+  def workdir
+    @workdir ||=  @google.file_by_url @url
   end
 end

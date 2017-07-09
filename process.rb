@@ -38,5 +38,6 @@ if options[:publish]
   lection = LectionInfoAccessor.new(options[:workdir])
   lection.share_slides
   lection.put_youtube_text
+  lection.patch_background
 end
 
