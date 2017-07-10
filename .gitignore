@@ -3,5 +3,4 @@
 /.idea/
 /secret/*
 !/secret/.gitkeep
-
-
+.DS_store

@@ -54,7 +54,7 @@ class PictureGenerator
     end
     File.open("#{tmp}/index.html", "w") {|file| file.puts text }
 
-    kit = IMGKit.new(File.new("#{tmp}/index.html"), transparent:true, quality:20)
+    kit = IMGKit.new(File.new("#{tmp}/index.html"), transparent:true, quality:20, width:1920, height:1080)
     kit.to_file resultname
     FileUtils.rm_rf tmp
   end

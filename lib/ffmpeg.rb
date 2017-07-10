@@ -20,7 +20,7 @@ class FFmpeg
   end
 
   def construct_cmd
-    %{ffmpeg #{all_inputs}  -filter_complex "#{all_filters}" -y '#{@dst}' }.gsub(/\s+/, ' ').strip
+    %{ffmpeg #{all_inputs}  -filter_complex "#{all_filters}" #{crf}  -y '#{@dst}' }.gsub(/\s+/, ' ').strip
   end
 
   def all_inputs
@@ -88,5 +88,9 @@ class FFmpeg
 
   def main_video_resolution
     @main_video_resolution ||= get_video_resolution_16x9 @video
+  end
+
+  def crf
+    @params[:small] ? '-preset ultrafast -crf 28': '-crf 17'
   end
 end
