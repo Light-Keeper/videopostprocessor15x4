@@ -11,6 +11,7 @@ class LectionInfoAccessor
   end
 
   def subs
+    shift_subs
     subtitles = info_file.worksheet_by_title 'subtitles'
     (3..subtitles.num_rows).map {|i| {
         start:  subtitles[i, 1],
@@ -94,6 +95,46 @@ class LectionInfoAccessor
   def youtube_text=(val)  set('текст для ютуба', val) end
 
   private
+
+  def shift_subs
+    subtitles = info_file.worksheet_by_title 'subtitles'
+    shift = subtitles[2,5]
+    return if shift == ''
+    shift = shift.to_f
+
+    (3..subtitles.num_rows).map do |i|
+      start = time_to_secons(subtitles[i, 1]) + shift
+      fin = time_to_secons(subtitles[i, 2]) + shift
+
+      subtitles[i, 1] = sec_to_time(start)
+      subtitles[i, 2] = sec_to_time(fin)
+    end
+
+    subtitles[2,5] = ''
+    subtitles.save
+  end
+
+  #TODO: move to semarate file and reuse
+  def time_to_secons(time)
+    return time if time.is_a? Integer
+    return time if time.is_a? Float
+    raise 'time has not been set' if time == ''
+
+    s = time.split(':').map {|v| v.to_f}
+
+    return s[0] if s.size == 1
+    return s[1] + s[0] * 60 if s.size == 2
+    return s[2] + s[1] * 60 + s[0] * 60 * 60 if s.size == 3
+    raise 'time format not supported'
+  end
+
+  def sec_to_time(sec)
+    h = (sec / 60 / 60).floor.to_s.rjust(2, '0')
+    m = (sec / 60 - h.to_f * 60).floor.to_s.rjust(2, '0')
+    s = (sec - m.to_f * 60 - h.to_f * 60 * 60).floor.to_s.rjust(2, '0')
+
+    res =  h == "00" ? "#{m}:#{s}" : "#{h}:#{m}:#{s}"
+  end
 
   def set(title, value)
     general[find_row(title), 2] = value
