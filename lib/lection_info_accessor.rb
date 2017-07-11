@@ -4,17 +4,14 @@ require_relative './file_format_utils'
 
 class LectionInfoAccessor
   include FileFormatUtils
+  attr_reader :url
 
   def initialize(url)
     @url = url
-    @google = GoogleAccessor.new
-    @info = info_file
-    @general = @info.worksheet_by_title 'general'
-    raise "can not find general workshet in the info.gsheet" unless @general
   end
 
   def subs
-    subtitles = @info.worksheet_by_title 'subtitles'
+    subtitles = info_file.worksheet_by_title 'subtitles'
     (3..subtitles.num_rows).map {|i| {
         start:  subtitles[i, 1],
         end:    subtitles[i, 2],
@@ -29,14 +26,13 @@ class LectionInfoAccessor
       return
     end
 
-    workdir =  @google.file_by_url @url
     presentation_dir = workdir.file_by_title 'presentation'
     files = presentation_dir.files
     raise 'presentation directory must have exactly 1 file or directory to share' unless files.size == 2
     to_share = files.find {|x| x.title != 'pages'}
     to_share.acl.push({type: 'anyone', role: 'reader'})
 
-    self.slides = @google.shorten_url  to_share.human_url
+    self.slides = google.shorten_url  to_share.human_url
   end
 
   def patch_background
@@ -79,6 +75,8 @@ class LectionInfoAccessor
     self.youtube_text = text
   end
 
+  private
+
   def lector_name()   find('Имя лектора')  end
   def lector_link()   find('ссылка на соцсеть лектора')  end
   def title()         find('Название')  end
@@ -97,29 +95,35 @@ class LectionInfoAccessor
   def ready_video=(val)   set('готовое к публикации видео', val)  end
   def youtube_text=(val)  set('текст для ютуба', val) end
 
-  private
-
   def set(title, value)
-    row = find_row title
-    @general[row, 2] = value
-    @general.save
+    general[find_row(title), 2] = value
+    general.save
   end
 
   def find(title)
-    @general[find_row(title), 2]
+    general[find_row(title), 2]
   end
 
   def find_row(title)
-    row = (2..100).find {|i| @general[i, 1].downcase.include? title.downcase}
-    row || raise("can not find row with title #{title} in the general workshet")
+    row = (2..100).find {|i| general[i, 1].downcase.include? title.downcase}
+    row or raise "can not find row with title #{title} in the general workshet"
+  end
+
+  def general
+    @general ||= info_file.worksheet_by_title 'general' or raise 'can not find general workshet in the info.gsheet'
   end
 
   def info_file
-    res = workdir.spreadsheets.find {|s| s.title == "info"}
-    res || raise('can not find info.gsheet!')
+    @info_file ||= workdir.spreadsheets.find {|s| s.title == "info"} or raise 'can not find info.gsheet!'
   end
 
   def workdir
-    @workdir ||=  @google.file_by_url @url
+    @workdir ||=  google.file_by_url url
   end
+
+  def google
+    @google ||= GoogleAccessor.new
+  end
+
+
 end
