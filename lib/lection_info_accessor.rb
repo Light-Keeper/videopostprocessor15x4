@@ -75,8 +75,6 @@ class LectionInfoAccessor
     self.youtube_text = text
   end
 
-  private
-
   def lector_name()   find('Имя лектора')  end
   def lector_link()   find('ссылка на соцсеть лектора')  end
   def title()         find('Название')  end
@@ -95,6 +93,8 @@ class LectionInfoAccessor
   def ready_video=(val)   set('готовое к публикации видео', val)  end
   def youtube_text=(val)  set('текст для ютуба', val) end
 
+  private
+
   def set(title, value)
     general[find_row(title), 2] = value
     general.save
@@ -110,7 +110,7 @@ class LectionInfoAccessor
   end
 
   def general
-    @general ||= info_file.worksheet_by_title 'general' or raise 'can not find general workshet in the info.gsheet'
+    @general ||= info_file.worksheet_by_title('general') or raise 'can not find general workshet in the info.gsheet'
   end
 
   def info_file
