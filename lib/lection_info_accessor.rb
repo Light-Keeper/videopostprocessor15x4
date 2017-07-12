@@ -17,8 +17,28 @@ class LectionInfoAccessor
         start:  subtitles[i, 1],
         end:    subtitles[i, 2],
         text:   subtitles[i, 3],
-        id:     i
+        id:     (i - 2).to_s.rjust(2, "0")
     }}
+  end
+
+  def upload_generated_images(dir)
+    collection = workdir.subcollection_by_title 'generated_images'
+    if collection == nil || collection.id == nil
+      collection = workdir.create_subcollection 'generated_images'
+    end
+
+    collection.files.each {|f| f.delete}
+
+    Dir.entries(dir)
+        .map {|f| File.join(dir, f) }
+        .select {|f| !File.directory? f }
+        .each {|f| collection.upload_from_file f, nil, :convert => false }
+  end
+
+  def publish_actions
+    self.share_slides
+    self.patch_background
+    self.put_youtube_text
   end
 
   def share_slides

@@ -33,9 +33,8 @@ class GoogleAccessor
 
     if uri.query
       params = CGI::parse(uri.query)
-      return @session.file_by_id params["id"][0] if params["id"]
+      return @session.file_by_id params["id"][0] unless params["id"].empty?
     end
-
     @session.file_by_url url
   end
 

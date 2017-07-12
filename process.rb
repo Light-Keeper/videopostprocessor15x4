@@ -19,6 +19,8 @@ if options[:pic]
   pictures.clear
   pictures.render_title lection.lector_name, lection.title
   pictures.render_subs lection.subs
+
+  lection.upload_generated_images "#{out_dir}/pic"
 end
 
 if options[:convert]
@@ -36,8 +38,6 @@ end
 if options[:publish]
   raise "working directory URL must be specified" unless options[:workdir]
   lection = LectionInfoAccessor.new(options[:workdir])
-  lection.share_slides
-  lection.put_youtube_text
-  lection.patch_background
+  lection.publish_actions
 end
 

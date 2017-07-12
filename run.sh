@@ -1,1 +1,1 @@
-ruby ./process.rb
+ruby ./process.rb $@
