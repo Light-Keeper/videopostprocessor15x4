@@ -21,6 +21,12 @@ class LectionInfoAccessor
     }}
   end
 
+  def upload_background(path)
+    workdir_file_by_title = workdir.file_by_title('background.png')
+    return if workdir_file_by_title
+    workdir.upload_from_file path, 'background.png', :convert => false
+  end
+
   def upload_generated_images(dir)
     collection = workdir.subcollection_by_title 'generated_images'
     if collection == nil || collection.id == nil
@@ -61,6 +67,9 @@ class LectionInfoAccessor
     background = workdir.file_by_title 'background.png'
 
     unless icon && background
+      p icon
+      p background
+      p workdir.files
       puts 'can not find icon.png or background.png. skipping...'
       return
     end
@@ -76,6 +85,7 @@ class LectionInfoAccessor
     crop = get_crop_to_16x9_filter bg_path
     `ffmpeg -i #{bg_path} -i #{icon_path} -filter_complex '[0:0] #{crop},scale=1280:720 [b];[b][1:0]overlay=x=30:y=30' -y ./out/thumbnail.png`
 
+    workdir.file_by_title('thumbnail.png')&.delete true
     workdir.upload_from_file(thumb_path, 'thumbnail.png', :convert => false)
     puts 'thumbnail.png generated!'
   end

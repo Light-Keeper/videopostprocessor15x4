@@ -20,15 +20,13 @@ class Parameters
     end.parse!
 
     if options[:trello]
-      trello = TrelloAccessor.new
-      info = trello.card_info options[:trello]
-
-      puts 'trello info:'
-      puts info
-
-      options[:video] ||= info[:video]
-      options[:workdir] ||= info[:workdir]
+      trello = TrelloAccessor.new options[:trello]
+      options[:video] ||= trello.video
+      options[:workdir] ||= trello.workdir
     end
+
+    puts "use video: #{options[:video]}"
+    puts "use workdir: #{options[:workdir]}"
 
     @options = options
   end

@@ -4,6 +4,7 @@ require_relative 'lib/picture_generator'
 require_relative 'lib/video_provider'
 require_relative 'lib/parameters'
 require_relative 'lib/ffmpeg'
+require_relative 'lib/trello_accessor'
 
 options = Parameters.new.options
 
@@ -38,6 +39,13 @@ end
 if options[:publish]
   raise "working directory URL must be specified" unless options[:workdir]
   lection = LectionInfoAccessor.new(options[:workdir])
+
+  if options[:trello]
+    trello = TrelloAccessor.new options[:trello]
+    preview = trello.preview
+    lection.upload_background preview if preview
+  end
+
   lection.publish_actions
 end
 

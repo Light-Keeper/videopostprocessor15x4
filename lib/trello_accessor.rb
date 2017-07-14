@@ -1,3 +1,4 @@
+require "open-uri"
 require 'trello'
 require 'json'
 
@@ -9,23 +10,40 @@ end
 
 class TrelloAccessor
 
-  def initialize()
-    @client = Trello.client
-  end
+  attr_reader :id, :client
 
-  def card_info(id)
+  def initialize(id)
+    @client = Trello.client
     match = id.match(/https:\/\/trello.com\/c\/([^\/?]*).*/)
     id = match.captures[0] if match
-    card = @client.find(:card, id)
-    comments = card.comments.map {|c| c.text }
-    {
-        :workdir => extract_url(comments[-1]),
-        :video => extract_url(comments[0])
-    }
+    @id = id
+  end
+
+  def video() extract_url(comments[0]) end
+  def workdir() extract_url(comments[-1]) end
+
+  def preview
+    attachment = card.attachments.find {|a| a.name.downcase =~ /^.*?(\.png$|\.jpg$)/}
+    return nil unless attachment
+
+    name = './out/background.png'
+    File.open(name, 'wb') do |fo|
+      fo.write open(attachment.url).read
+    end
+    name
+  end
+
+  private
+
+  def card
+    @card ||= client.find(:card, id)
+  end
+
+  def comments
+    @comments ||= card.comments.map {|c| c.text }
   end
 
   def extract_url(text)
     URI.extract(text)[0]
   end
-
 end
