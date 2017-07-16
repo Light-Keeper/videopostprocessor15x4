@@ -33,6 +33,16 @@ class TrelloAccessor
     name
   end
 
+  def listname
+    card.list.name
+  end
+
+  def set_label(name)
+    return if card.labels.any? {|l| l.name == name }
+    label = card.board.labels.find {|l| l.name == name}
+    card.add_label label if label
+  end
+
   private
 
   def card
