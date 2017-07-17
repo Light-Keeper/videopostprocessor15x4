@@ -29,19 +29,19 @@ def action_publish(trello, workdir, info)
   end
 end
 
+def action_unknown(trello, workdir, info)
+  puts 'don\'t know what to do with cards in this list!'
+end
+
 def action_default(trello, workdir, info)
   list = trello.listname
   puts "the card is in list '#{list}'"
 
-  if list == 'подготовка к публикации'
-    return action_publish trello, workdir, info
-  end
+  method = :action_unknown
+  method = :action_publish if list == 'подготовка к публикации'
+  method = :action_update_pictures if list == 'проверить и сконвертировать субтитры'
 
-  if list == 'проверить и сконвертировать субтитры'
-    return action_update_pictures trello, workdir, info
-  end
-
-  puts 'don\'t know what to do with cards in this list!'
+  send method, trello, workdir, info
 end
 
 def run_with_lection
