@@ -2,7 +2,7 @@ require_relative 'trello_accessor'
 require_relative 'google/google_factoty'
 require_relative 'lection/general_info'
 require_relative 'lection/publicator'
-
+require_relative 'picture_generator'
 
 def action_update_pictures(trello, workdir, info)
   puts 'rendering subtitles....'
@@ -34,12 +34,14 @@ def action_default(trello, workdir, info)
   puts "the card is in list '#{list}'"
 
   if list == 'подготовка к публикации'
-    action_publish trello, workdir, info
+    return action_publish trello, workdir, info
   end
 
   if list == 'проверить и сконвертировать субтитры'
-    action_update_pictures trello, workdir, info
+    return action_update_pictures trello, workdir, info
   end
+
+  puts 'don\'t know what to do with cards in this list!'
 end
 
 def run_with_lection
