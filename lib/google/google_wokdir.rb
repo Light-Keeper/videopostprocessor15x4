@@ -38,9 +38,9 @@ class GoogleWorkdir
 
   def presentation_url
     presentation_dir = workdir.file_by_title 'presentation'
-    files = presentation_dir.files
-    raise 'presentation directory must have exactly 1 file or directory to share' unless files.size == 2
-    to_share = files.find {|x| x.title != 'pages'}
+    files = presentation_dir.files.find_all {|x| x.title != 'pages'}
+    raise 'presentation directory must have exactly 1 file or directory to share' unless files.size == 1
+    to_share = files.first
     to_share.acl.push({type: 'anyone', role: 'reader'})
     to_share.human_url
   end
